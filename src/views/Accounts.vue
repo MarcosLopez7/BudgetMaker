@@ -1,10 +1,18 @@
 <template>
-  <div>
-    <h1>Accounts</h1>
-    <span>Your balance is: {{ mainBalance }}</span>
-    <p v-for="account in accounts" :key="account.name">
-      {{ account.name }} : {{ account.balance }}
-    </p>
+  <div class="accountsPage">
+    <h1 class="title">Accounts</h1>
+    <div class="balance">
+      <span>Your balance is: {{ mainBalance }}</span>
+    </div>
+    <div class="acoountList">
+      <div
+        class="accountElement"
+        v-for="account in accounts"
+        :key="account.name"
+      >
+        <span> {{ account.name }} : {{ account.balance }} </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,4 +43,31 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.accountsPage {
+  margin-top: 20px;
+}
+
+.title {
+  text-align: center;
+}
+
+.balance {
+  margin: 10px 0;
+  font-size: 24px;
+  text-align: center;
+}
+
+.acoountList {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.accountElement {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+</style>
