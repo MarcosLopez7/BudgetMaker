@@ -13,7 +13,10 @@
         <span> {{ account.name }}: </span> <span>${{ account.balance }} </span>
       </div>
     </div>
-    <div v-show="addingAccount" class="addingAccount">
+    <div class="bottom-button">
+      <button class="btn btn-primary">Add Income</button>
+    </div>
+    <!-- <div v-show="addingAccount" class="addingAccount">
       <input
         class="form-control"
         type="text"
@@ -38,7 +41,7 @@
       >
         <i class="fa fa-plus" aria-hidden="true"></i>
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -46,16 +49,9 @@
 export default {
   data() {
     return {
-      availableMoney: 2000,
+      availableMoney: 0,
       addingAccount: false,
-      accounts: [
-        { name: "Expenses", balance: 0 },
-        { name: "Fun", balance: 200 },
-        { name: "Offering", balance: 100 },
-        { name: "Education", balance: 200 },
-        { name: "Savings", balance: 250 },
-        { name: "Investments", balance: 150 },
-      ],
+      accounts: [],
       newAccountInput: "",
     };
   },
@@ -79,6 +75,13 @@ export default {
         this.addingAccount = false;
       }
     },
+  },
+  mounted() {
+    if (localStorage.data) {
+      const data = JSON.parse(localStorage.getItem("data"));
+      this.availableMoney = data.availableMoney;
+      this.accounts = data.accounts;
+    }
   },
 };
 </script>
@@ -140,5 +143,11 @@ export default {
 
 .addingAccount button {
   margin: 0 5px;
+}
+
+.bottom-button {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
 }
 </style>

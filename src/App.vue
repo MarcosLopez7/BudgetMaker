@@ -1,15 +1,45 @@
 <template>
-  <div id="nav">
+  <nav class="topnav">
+    <div class="top">
+      <span>
+        <a
+          href="javascript:void(0);"
+          class="icon"
+          @click="showMenu = !showMenu"
+        >
+          <i class="fa fa-bars"></i>
+        </a>
+      </span>
+      <span>
+        <a href="#" class="active"><h1>Budget Maker</h1></a>
+      </span>
+    </div>
+    <!-- Navigation links (hidden by default) -->
+    <div id="myLinks" v-show="showMenu">
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+    </div>
+    <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+  </nav>
+  <!-- <div id="nav">
     <h1>Budget Maker</h1>
-    <!-- <router-link to="/">Home</router-link> |
+    <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link> |
-    <router-link to="/accounts">Accounts</router-link> -->
-  </div>
+    <router-link to="/accounts">Accounts</router-link>
+  </div> -->
   <router-view />
 </template>
 
 <script>
+import { data } from "@/utilities/initData.js";
+
 export default {
+  data() {
+    return {
+      showMenu: false,
+    };
+  },
   mounted() {
     const recaptchaScript = document.createElement("script");
     recaptchaScript.setAttribute(
@@ -17,6 +47,11 @@ export default {
       "https://use.fontawesome.com/aa4ffc396e.js"
     );
     document.head.appendChild(recaptchaScript);
+    console.log(data);
+    localStorage.setItem("data", JSON.stringify(data));
+    if (typeof localStorage.data === "undefined") {
+      localStorage.setItem("data", JSON.stringify(data));
+    }
   },
 };
 </script>
@@ -48,16 +83,6 @@ body {
 
 h1 {
   margin: 0;
-}
-
-#nav {
-  background-color: var(--bg-card);
-  padding: 5px 10px;
-}
-
-#nav a {
-  color: inherit;
-  text-decoration: none;
 }
 
 .btn {
@@ -109,5 +134,63 @@ h1 {
   appearance: none;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/*                     BLOQUE PARA EL NAV BAR             */
+#nav {
+  background-color: var(--bg-card);
+  padding: 5px 10px;
+}
+
+#nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#myLinks {
+  position: fixed;
+  background: #333;
+  width: 40%;
+  height: 100%;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: var(--bg-card);
+  position: relative;
+}
+
+.top {
+  display: flex;
+  /* width: 100%; */
+  justify-content: center;
+}
+
+.top h1 {
+  font-size: 1.2rem;
+}
+
+/* Style navigation menu links */
+.topnav a {
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  display: block;
+}
+
+/* Style the hamburger menu */
+.topnav a.icon {
+  background: var(--bg-card);
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 3px;
+}
+
+/* Style the active link (or home/logo) */
+.active {
+  background-color: var(--bg-card);
+  color: white;
 }
 </style>
