@@ -11,14 +11,14 @@
         </a>
       </span>
       <span>
-        <a href="#" class="active"><h1>Budget Maker</h1></a>
+        <a href="/" class="active"><h1>Budget Maker</h1></a>
       </span>
     </div>
     <!-- Navigation links (hidden by default) -->
     <div id="myLinks" v-show="showMenu">
       <a href="#news">News</a>
       <a href="#contact">Contact</a>
-      <a href="#about">About</a>
+      <router-link to="/about">About</router-link>
     </div>
     <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
   </nav>
@@ -47,8 +47,6 @@ export default {
       "https://use.fontawesome.com/aa4ffc396e.js"
     );
     document.head.appendChild(recaptchaScript);
-    console.log(data);
-    localStorage.setItem("data", JSON.stringify(data));
     if (typeof localStorage.data === "undefined") {
       localStorage.setItem("data", JSON.stringify(data));
     }
@@ -192,5 +190,10 @@ h1 {
 .active {
   background-color: var(--bg-card);
   color: white;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.3rem;
 }
 </style>

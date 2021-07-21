@@ -1,6 +1,6 @@
 <template>
   <div class="accountsPage">
-    <h1 class="title">Accounts</h1>
+    <h2 class="title">Accounts</h2>
     <div class="balance">
       <span>Your balance is: ${{ mainBalance }}</span>
     </div>
@@ -14,7 +14,13 @@
       </div>
     </div>
     <div class="bottom-button">
-      <button class="btn btn-primary">Add Income</button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        @click="goToAddIncomeView()"
+      >
+        Add Income
+      </button>
     </div>
     <!-- <div v-show="addingAccount" class="addingAccount">
       <input
@@ -75,6 +81,9 @@ export default {
         this.addingAccount = false;
       }
     },
+    goToAddIncomeView() {
+      location.href = "/add-income";
+    },
   },
   mounted() {
     if (localStorage.data) {
@@ -89,10 +98,6 @@ export default {
 <style>
 .accountsPage {
   margin-top: 20px;
-}
-
-.title {
-  text-align: center;
 }
 
 .balance {
