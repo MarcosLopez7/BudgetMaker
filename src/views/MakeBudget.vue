@@ -13,7 +13,7 @@
 
 <script>
 /* TODO LIST 
-  1. Crear componente
+  1. Crear componente X
   2. Obtener datos del local storage de las cuentas
   3. Obtener inputs de fecha e ingreso 
   4. Renderizar monto disponible
@@ -34,21 +34,28 @@
   12. Guardar en localStorage presupuesto
   13. UT
 */
+import LocalStorageManager from "@/utilities/LocalStorageManager.js";
 
 export default {
   data() {
     return {
       amount: "",
       date: "",
+      accounts: [],
     };
   },
-  mounted() {
+  created() {
     const date = new Date(Date.now());
     let month = date.getMonth();
     if (10 > month) {
       month = "0" + month;
     }
     this.date = `${date.getFullYear()}-${month}-${date.getDate()}`;
+
+    LocalStorageManager.load();
+
+    const dataObj = JSON.parse(localStorage.getItem("data"));
+    this.accounts = dataObj.accounts;
   },
 };
 </script>

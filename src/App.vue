@@ -11,7 +11,9 @@
         </a>
       </span>
       <span>
-        <a href="/" class="active"><h1>Budget Maker</h1></a>
+        <router-link :to="{ name: 'index' }" class="active"
+          ><h1>Budget Maker</h1></router-link
+        >
       </span>
     </div>
     <!-- Navigation links (hidden by default) -->

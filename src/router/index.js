@@ -2,12 +2,12 @@ import { createRouter, createWebHistory } from "vue-router";
 // import Home from "../views/Home.vue";
 import Accounts from "@/views/Accounts.vue";
 import About from "@/views/About.vue";
-import AddIncome from "@/views/AddIcome.vue";
+import MakeBudget from "@/views/MakeBudget.vue";
 
 const routes = [
   {
     path: "/",
-    name: "Accounts",
+    name: "index",
     component: Accounts,
   },
   {
@@ -16,9 +16,9 @@ const routes = [
     component: About,
   },
   {
-    path: "/add-income",
-    name: "AddIncome",
-    component: AddIncome,
+    path: "/make-budget",
+    name: "MakeBudget",
+    component: MakeBudget,
   },
 ];
 

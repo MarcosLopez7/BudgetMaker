@@ -19,28 +19,15 @@
       <a href="#">Add Account</a>
     </div>
     <div class="bottom-button">
-      <button
-        type="button"
-        class="btn btn-primary"
-        @click="goToAddIncomeView()"
-      >
-        Add Income
-      </button>
+      <router-link :to="{ name: 'MakeBudget' }">
+        <button type="button" class="btn btn-primary">Add Income</button>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script>
-/* TODO LIST 
-  1. Crear componente X
-  2. Obtener datos del local storage de las cuentas X
-  3. Sumar el balance total de las cuentas y el residuo X
-  4. Renderizar residuo X
-  5. Renderizar lista de cuentas X
-  6. Link a hacer presupuesto o lista de cuentas X
-  7. Hacer UT de de que se está renderizando los datos
-*/
-import { data } from "@/utilities/initData.js";
+import LocalStorageManager from "@/utilities/LocalStorageManager.js";
 
 export default {
   data() {
@@ -70,14 +57,11 @@ export default {
       }
     },
     goToAddIncomeView() {
-      location.href = "/add-income";
+      location.href = "/make-budget";
     },
   },
   created() {
-    if (!localStorage.data) {
-      const dataStr = JSON.stringify(data);
-      localStorage.setItem("data", dataStr);
-    }
+    LocalStorageManager.load();
 
     const dataObj = JSON.parse(localStorage.getItem("data"));
     // this.availableMoney = dataObj.availableMoney;
