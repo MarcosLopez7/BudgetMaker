@@ -22,36 +22,20 @@
         Add Income
       </button>
     </div>
-    <!-- <div v-show="addingAccount" class="addingAccount">
-      <input
-        class="form-control"
-        type="text"
-        v-model="newAccountInput"
-        placeholder="New Account"
-        @keyup.enter="addAccount()"
-      />
-      <button
-        class="btn btn-danger"
-        type="button"
-        @click="addingAccount = !addingAccount"
-      >
-        <i class="fa fa-times" aria-hidden="true"></i>
-      </button>
-    </div>
-    <div v-show="!addingAccount" class="addCountSection">
-      <span>Add Account</span>
-      <button
-        class="btn btn-primary"
-        type="button"
-        @click="addingAccount = !addingAccount"
-      >
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </div> -->
   </div>
 </template>
 
 <script>
+/* TODO LIST 
+  1. Crear componente
+  2. Obtener datos del local storage de las cuentas
+  3. Sumar el balance total de las cuentas y el residuo
+  4. Renderizar residuo
+  5. Renderizar lista de cuentas
+  6. Link a hacer presupuesto o lista de cuentas
+  7. Hacer UT de de que se está renderizando los datos
+*/
+
 export default {
   data() {
     return {

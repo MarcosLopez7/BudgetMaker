@@ -7,5 +7,5 @@ export const data = {
     { name: "Savings", balance: 250 },
     { name: "Investments", balance: 150 },
   ],
-  availableMoney: 2000,
+  unassigned: 0,
 };
