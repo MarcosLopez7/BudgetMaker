@@ -195,5 +195,6 @@ h1 {
 .title {
   text-align: center;
   font-size: 2.3rem;
+  margin: 25px 0;
 }
 </style>

@@ -2,16 +2,21 @@
   <div class="accountsPage">
     <h2 class="title">Accounts</h2>
     <div class="balance">
-      <span>Your balance is: ${{ mainBalance }}</span>
+      <span test-id="mainBalanceTest">Your balance is: ${{ mainBalance }}</span>
+      <span test-id="unassignedTest" class="unassigned-money"
+        >Unassigned money: ${{ unassigned }}
+      </span>
     </div>
     <div class="accountList">
       <div
         class="accountElement"
+        test-id="accountTest"
         v-for="account in accounts"
         :key="account.name"
       >
         <span> {{ account.name }}: </span> <span>${{ account.balance }} </span>
       </div>
+      <a href="#">Add Account</a>
     </div>
     <div class="bottom-button">
       <button
@@ -27,22 +32,21 @@
 
 <script>
 /* TODO LIST 
-  1. Crear componente
-  2. Obtener datos del local storage de las cuentas
-  3. Sumar el balance total de las cuentas y el residuo
-  4. Renderizar residuo
-  5. Renderizar lista de cuentas
-  6. Link a hacer presupuesto o lista de cuentas
+  1. Crear componente X
+  2. Obtener datos del local storage de las cuentas X
+  3. Sumar el balance total de las cuentas y el residuo X
+  4. Renderizar residuo X
+  5. Renderizar lista de cuentas X
+  6. Link a hacer presupuesto o lista de cuentas X
   7. Hacer UT de de que se está renderizando los datos
 */
+import { data } from "@/utilities/initData.js";
 
 export default {
   data() {
     return {
-      availableMoney: 0,
-      addingAccount: false,
       accounts: [],
-      newAccountInput: "",
+      unassigned: 0,
     };
   },
   computed: {
@@ -51,7 +55,7 @@ export default {
       this.accounts.forEach(
         (account) => (totalAmountAccounts += account.balance)
       );
-      return this.availableMoney - totalAmountAccounts;
+      return totalAmountAccounts + this.unassigned;
     },
   },
   methods: {
@@ -69,25 +73,38 @@ export default {
       location.href = "/add-income";
     },
   },
-  mounted() {
-    if (localStorage.data) {
-      const data = JSON.parse(localStorage.getItem("data"));
-      this.availableMoney = data.availableMoney;
-      this.accounts = data.accounts;
+  created() {
+    if (!localStorage.data) {
+      const dataStr = JSON.stringify(data);
+      localStorage.setItem("data", dataStr);
     }
+
+    const dataObj = JSON.parse(localStorage.getItem("data"));
+    // this.availableMoney = dataObj.availableMoney;
+    this.accounts = dataObj.accounts;
+    this.unassigned = dataObj.unassigned;
   },
 };
 </script>
 
 <style>
 .accountsPage {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .balance {
   margin: 10px 0;
   font-size: 24px;
   text-align: center;
+}
+
+.balance span {
+  display: block;
+}
+
+.unassigned-money {
+  margin: 15px 0;
+  font-size: 18px;
 }
 
 /* .acoountList {
@@ -138,5 +155,11 @@ export default {
   display: flex;
   justify-content: center;
   margin: 40px 0;
+}
+
+.accountList a {
+  text-decoration: none;
+  color: var(--bg-card);
+  padding: 0 20px;
 }
 </style>
