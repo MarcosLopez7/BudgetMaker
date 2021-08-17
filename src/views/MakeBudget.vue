@@ -1,23 +1,46 @@
 <template>
   <div class="add-income">
-    <h2 class="title">Add Income</h2>
-    <input
-      type="number"
-      class="form-control"
-      placeholder="Amount"
-      v-model="amount"
-    />
-    <input type="date" class="form-control" v-model="date" />
+    <h2 class="title">Make Budget</h2>
+    <form>
+      <div class="form-field">
+        <label for="amountIncome">Amount Income</label>
+        <input
+          id="amountIncome"
+          type="number"
+          class="form-control"
+          placeholder="Amount"
+          v-model="amount"
+          required
+        />
+      </div>
+      <div class="form-field">
+        <label for="cutOffDate">Cut Off Date</label>
+        <input
+          id="cutOffDate"
+          type="date"
+          class="form-control"
+          v-model="date"
+          required
+        />
+      </div>
+
+      <span class="available-money">
+        Money available: ${{ availableMoney }}
+      </span>
+
+      <ExpenseList />
+    </form>
   </div>
 </template>
 
 <script>
 /* TODO LIST 
   1. Crear componente X
-  2. Obtener datos del local storage de las cuentas
-  3. Obtener inputs de fecha e ingreso 
-  4. Renderizar monto disponible
-  5. Creación de componente de lista de gastos
+  2. Obtener datos del local storage de las cuentas X
+  3. Obtener inputs de fecha e ingreso X
+    Arreglar CSS después
+  4. Renderizar monto disponible X
+  5. Creación de componente de lista de gastos 
     1. Renderizar lista de gastos proveniente de array
     2. Agregar, eliminar y editar lista de array
     3. Suma automática por modificación en la lista con computer
@@ -35,18 +58,34 @@
   13. UT
 */
 import LocalStorageManager from "@/utilities/LocalStorageManager.js";
+import ExpenseList from "@/components/ExpenseList.vue";
 
 export default {
+  components: {
+    ExpenseList,
+  },
   data() {
     return {
-      amount: "",
+      amount: "0.00",
       date: "",
       accounts: [],
+      unassigned: 0,
     };
+  },
+  computed: {
+    availableMoney() {
+      let result = this.unassigned;
+
+      if (this.amount !== "") {
+        result += this.amount;
+      }
+
+      return Math.round(result * 100) / 100;
+    },
   },
   created() {
     const date = new Date(Date.now());
-    let month = date.getMonth();
+    let month = date.getMonth() + 1;
     if (10 > month) {
       month = "0" + month;
     }
@@ -56,19 +95,31 @@ export default {
 
     const dataObj = JSON.parse(localStorage.getItem("data"));
     this.accounts = dataObj.accounts;
+    this.unassigned = dataObj.unassigned;
   },
 };
 </script>
 
 <style>
-/* .add-income {
-  display: flex;
-  justify-content: center;
-} */
+.add-income {
+  padding: 0px 25px;
+  /* margin: 0 10px; */
+  /* max-width: 100%;*/
+}
+
+.form-field {
+  margin: 25px auto;
+}
 
 .add-income input {
-  width: 280px;
-  margin: 25px auto;
+  width: 285px;
   font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.available-money {
+  text-align: center;
+  font-size: 24px;
+  display: block;
 }
 </style>

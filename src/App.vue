@@ -1,5 +1,5 @@
 <template>
-  <nav class="topnav">
+  <nav id="nav" class="topnav">
     <div class="top">
       <span>
         <a
@@ -170,11 +170,9 @@ h1 {
   font-size: 1.2rem;
 }
 
-/* Style navigation menu links */
-.topnav a {
-  color: white;
-  padding: 14px 16px;
-  text-decoration: none;
+/* Style navlabel {
+    display: inline-block;
+}ration: none;
   font-size: 17px;
   display: block;
 }
@@ -199,4 +197,13 @@ h1 {
   font-size: 2.3rem;
   margin: 25px 0;
 }
+
+/* FORMULARIOS */
+/* .form-label {
+  margin-bottom: 0.5rem;
+}
+
+label {
+  display: inline-block;
+} */
 </style>
