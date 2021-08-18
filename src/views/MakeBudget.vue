@@ -10,6 +10,7 @@
           class="form-control"
           placeholder="Amount"
           v-model="amount"
+          min="0"
           required
         />
       </div>
@@ -43,9 +44,10 @@
   5. Creación de componente de lista de gastos 
     1. Renderizar lista de gastos proveniente de array
     2. Agregar, eliminar y editar lista de array
-      Validar inputs de cantidad y nombre
-      Hacer CSS para errores en el input
+      Validar inputs de cantidad y nombre X
+      Hacer CSS para errores en el input X
       Botón para eliminar
+      Modal para editar gasto
     3. Suma automática por modificación en la lista con computer
     4. Salvar lista de gastos en el presupuesto correspondiente
     5. Emitir a componente padre el total de gastos
@@ -106,8 +108,6 @@ export default {
 <style>
 .add-income {
   padding: 0px 25px;
-  /* margin: 0 10px; */
-  /* max-width: 100%;*/
 }
 
 .form-field {
@@ -115,9 +115,8 @@ export default {
 }
 
 .add-income input {
-  width: 285px;
   font-size: 1.2rem;
-  margin-top: 10px;
+  margin: 10px 0;
 }
 
 .available-money {

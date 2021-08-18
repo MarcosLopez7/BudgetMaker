@@ -194,8 +194,14 @@ h1 {
 }
 
 .input-error {
-  border: red;
+  border: #dc3545;
   border-style: inset;
+}
+
+.field-error {
+  color: #dc3545;
+  margin-top: 5px;
+  font-size: 14px;
 }
 
 /* FORMULARIOS */
