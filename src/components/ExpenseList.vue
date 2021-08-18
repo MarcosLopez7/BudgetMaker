@@ -7,7 +7,11 @@
         <span>{{ expense.name }}</span> <span>${{ expense.amount }}</span>
       </div>
     </div>
-    <button type="button" @click="isAddingExpense = !isAddingExpense">
+    <button
+      type="button"
+      class="btn btn-primary"
+      @click="isAddingExpense = !isAddingExpense"
+    >
       Add Expense
     </button>
     <div v-if="isAddingExpense" class="input-expense">

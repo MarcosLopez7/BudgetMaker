@@ -43,6 +43,9 @@
   5. Creación de componente de lista de gastos 
     1. Renderizar lista de gastos proveniente de array
     2. Agregar, eliminar y editar lista de array
+      Validar inputs de cantidad y nombre
+      Hacer CSS para errores en el input
+      Botón para eliminar
     3. Suma automática por modificación en la lista con computer
     4. Salvar lista de gastos en el presupuesto correspondiente
     5. Emitir a componente padre el total de gastos

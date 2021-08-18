@@ -24,12 +24,6 @@
     </div>
     <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
   </nav>
-  <!-- <div id="nav">
-    <h1>Budget Maker</h1>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/accounts">Accounts</router-link>
-  </div> -->
   <router-view />
 </template>
 
@@ -134,6 +128,7 @@ h1 {
   appearance: none;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  box-sizing: border-box;
 }
 
 /*                     BLOQUE PARA EL NAV BAR             */
@@ -196,6 +191,11 @@ h1 {
   text-align: center;
   font-size: 2.3rem;
   margin: 25px 0;
+}
+
+.input-error {
+  border: red;
+  border-style: inset;
 }
 
 /* FORMULARIOS */
