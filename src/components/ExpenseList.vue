@@ -11,6 +11,9 @@
       >
         <span>{{ expense.name }}</span> <span>${{ expense.amount }}</span>
       </div>
+      <div class="row-list total-expense">
+        <span>Total</span><span>${{ totalExpense }}</span>
+      </div>
     </div>
     <button
       type="button"
@@ -94,6 +97,15 @@ export default {
       },
     };
   },
+  computed: {
+    totalExpense() {
+      let result = 0;
+
+      this.expenses.forEach((expense) => (result = expense.amount + result));
+
+      return result;
+    },
+  },
   methods: {
     saveExpense() {
       if (this.validateExpenseInput()) {
@@ -108,6 +120,7 @@ export default {
           this.expenses[this.edditingIndex] = expenseObject;
         }
 
+        this.$emit("updateExpenses", this.expense);
         this.cleanInputs();
       }
     },
@@ -157,8 +170,12 @@ export default {
     },
     removeExpense() {
       this.expenses.splice(this.edditingIndex, 1);
+      this.$emit("updateExpenses", this.expense);
       this.cleanInputs();
     },
+  },
+  created() {
+    this.$emit("updateExpenses", this.expenses);
   },
 };
 </script>
@@ -208,5 +225,10 @@ h3 {
 
 .close:hover {
   color: #dc3545;
+}
+
+.total-expense {
+  margin: 20px 0;
+  font-size: 22px;
 }
 </style>

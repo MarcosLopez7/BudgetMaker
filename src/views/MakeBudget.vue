@@ -29,7 +29,7 @@
         Money available: ${{ availableMoney }}
       </span>
 
-      <ExpenseList />
+      <ExpenseList @updateExpenses="updateExpenseList" />
     </form>
   </div>
 </template>
@@ -75,6 +75,7 @@ export default {
       date: "",
       accounts: [],
       unassigned: 0,
+      expenses: [],
     };
   },
   computed: {
@@ -86,6 +87,11 @@ export default {
       }
 
       return Math.round(result * 100) / 100;
+    },
+  },
+  methods: {
+    updateExpenseList(expenseList) {
+      this.expenses = expenseList;
     },
   },
   created() {
