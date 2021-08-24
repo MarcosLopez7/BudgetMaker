@@ -36,6 +36,7 @@
           v-model="expenseInput.input"
           maxlength="50"
           placeholder="Name"
+          @keyup.enter="saveExpense()"
         />
         <span class="field-error" v-show="expenseInput.error !== ''">{{
           expenseInput.error
@@ -49,6 +50,7 @@
           type="number"
           v-model="amountInput.input"
           placeholder="Amount"
+          @keyup.enter="saveExpense()"
         />
         <span class="field-error" v-show="amountInput.error !== ''">{{
           amountInput.error
@@ -63,8 +65,8 @@
         >
           Remove
         </button>
-        <button type="button" class="btn btn-primary" @click="addExpense()">
-          Add
+        <button type="button" class="btn btn-primary" @click="saveExpense()">
+          Save
         </button>
       </div>
     </div>
@@ -93,12 +95,18 @@ export default {
     };
   },
   methods: {
-    addExpense() {
+    saveExpense() {
       if (this.validateExpenseInput()) {
-        this.expenses.push({
+        const expenseObject = {
           name: this.expenseInput.input,
           amount: parseFloat(this.amountInput.input),
-        });
+        };
+
+        if (this.edditingIndex < 0) {
+          this.expenses.push(expenseObject);
+        } else {
+          this.expenses[this.edditingIndex] = expenseObject;
+        }
 
         this.cleanInputs();
       }
@@ -117,6 +125,9 @@ export default {
       this.edditingIndex = -1;
     },
     validateExpenseInput() {
+      this.expenseInput.error = "";
+      this.amountInput.error = "";
+
       if (this.expenseInput.input.replace(/\s/g, "") === "") {
         this.expenseInput.error = "Please insert a name for this expense";
       }
@@ -137,7 +148,7 @@ export default {
         error: "",
       };
       this.amountInput = {
-        input: expense.amount,
+        input: expense.amount.toString(),
         error: "",
       };
 
@@ -186,8 +197,9 @@ h3 {
 }
 
 .input-expense {
-  background-color: var(--bg-card);
   padding: 10px 10px;
+  border: solid 2px var(--bg-card);
+  border-radius: 5px;
 }
 
 .close {
