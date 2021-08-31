@@ -7,18 +7,21 @@
         class="row-list expense-item"
         v-for="(expense, index) in expenses"
         :key="expense"
+        test-id="expense-row"
         @click="editExpense(expense, index)"
       >
-        <span>{{ expense.name }}</span> <span>${{ expense.amount }}</span>
+        <span test-id="expense-name-span">{{ expense.name }}</span>
+        <span test-id="expense-name-amount">${{ expense.amount }}</span>
       </div>
       <div class="row-list total-expense">
-        <span>Total</span><span>${{ totalExpense }}</span>
+        <span>Total</span><span test-id="total-sum">${{ totalExpense }}</span>
       </div>
     </div>
     <button
       type="button"
       v-if="!isAddingExpense"
       class="btn btn-primary"
+      test-id="open-add-expense-button"
       @click="isAddingExpense = !isAddingExpense"
     >
       Add Expense
@@ -36,14 +39,18 @@
           id="nameExpense"
           class="form-control"
           type="text"
+          test-id="name-expense-input"
           v-model="expenseInput.input"
           maxlength="50"
           placeholder="Name"
           @keyup.enter="saveExpense()"
         />
-        <span class="field-error" v-show="expenseInput.error !== ''">{{
-          expenseInput.error
-        }}</span>
+        <span
+          class="field-error"
+          test-id="expense-name-error-label"
+          v-show="expenseInput.error !== ''"
+          >{{ expenseInput.error }}</span
+        >
       </div>
       <div class="form-field">
         <label for="amountExpense">Amount</label>
@@ -51,24 +58,34 @@
           id="amountExpense"
           class="form-control"
           type="number"
+          test-id="amount-expense-input"
           v-model="amountInput.input"
           placeholder="Amount"
           @keyup.enter="saveExpense()"
         />
-        <span class="field-error" v-show="amountInput.error !== ''">{{
-          amountInput.error
-        }}</span>
+        <span
+          class="field-error"
+          test-id="expense-amount-error-label"
+          v-show="amountInput.error !== ''"
+          >{{ amountInput.error }}</span
+        >
       </div>
       <div class="expense-buttons">
         <button
           v-if="edditingIndex >= 0"
           type="button"
           class="btn btn-danger"
+          test-id="remove-expense"
           @click="removeExpense()"
         >
           Remove
         </button>
-        <button type="button" class="btn btn-primary" @click="saveExpense()">
+        <button
+          type="button"
+          class="btn btn-primary"
+          test-id="save-expense"
+          @click="saveExpense()"
+        >
           Save
         </button>
       </div>

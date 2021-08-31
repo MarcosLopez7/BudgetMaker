@@ -46,10 +46,10 @@
     2. Agregar, eliminar y editar lista de array
       Validar inputs de cantidad y nombre X
       Hacer CSS para errores en el input X
-      Botón para eliminar
+      Botón para eliminar 
       Modal para editar gasto
-    3. Suma automática por modificación en la lista con computer
-    4. Salvar lista de gastos en el presupuesto correspondiente
+    3. Suma automática por modificación en la lista con computer X
+    4. Salvar lista de gastos en el presupuesto correspondiente X
     5. Emitir a componente padre el total de gastos
     6. UT
   6. Obtener total de gastos y agregar automáticamente a la lista
