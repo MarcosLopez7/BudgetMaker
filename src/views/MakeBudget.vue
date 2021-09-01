@@ -11,6 +11,7 @@
           placeholder="Amount"
           v-model="amount"
           min="0"
+          @input="modifyAmountByIncome()"
           required
         />
       </div>
@@ -56,19 +57,38 @@
           ></i
           >{{ account.name }}</span
         >
-        <span v-show="!account.isEditting">%0</span>
+        <span v-show="!account.isEditting">%{{ account.percent }}</span>
         <div v-show="account.isEditting">
           <input
             :id="`percent-input-${index}`"
+            v-model="account.percent"
             type="number"
             @keyup.enter="account.isEditting = false"
+            @input="modifyAmountByPercent(index)"
           />
         </div>
-        <span v-show="!account.isEditting">$0</span>
+        <span v-show="!account.isEditting">${{ account.amount }}</span>
         <div v-show="account.isEditting">
-          <input type="number" @keyup.enter="account.isEditting = false" />
+          <input
+            v-model="account.amount"
+            type="number"
+            @keyup.enter="account.isEditting = false"
+            @input="modifyPercentByAmount(index)"
+          />
         </div>
-        <span>${{ account.balance }}</span>
+        <span
+          >${{
+            (parseFloat(account.amount) + parseFloat(account.balance)).toFixed(
+              2
+            )
+          }}</span
+        >
+      </div>
+      <div class="table-account-row-carnitaasada edditing-row">
+        <span class="start-row">Total</span>
+        <span>%{{ totalPercent }}</span>
+        <span>${{ totalAmount }}</span>
+        <span>${{ totalBalance }}</span>
       </div>
     </form>
   </div>
@@ -95,10 +115,14 @@
   6. Obtener total de gastos y agregar automáticamente a la lista X
   7. Renderizar tabla de cuentas para asignar por porcentaje y monto,
   más balance acumulado X
-    1. Poner inputs en cada columna 
-    2. Poner una fila modificable
-    3. Hacer click a row para poner inputs
+    1. Poner inputs en cada columna  X
+    2. Poner una fila modificable X
+    3. Hacer click a row para poner inputs X
+
+  TRATAR DE CERRAR LA EDICIÒN FILA DANDO LE CLICK A OTRO LADO EN VEZ DE USAR EL TACHE
+
   8. Modificación automática de porcentajes, monto y balance
+    1. Validar que no se envien strings por ningun input y mandar 0 u otro numero a las modificaciones
   9. Suma total de porcentaje, monto y balance
   10. Validar Inputs númericos a sólo positivos
   11. Validar que no se asigne mayor presupuesto
@@ -114,7 +138,7 @@ export default {
   },
   data() {
     return {
-      amount: "0.00",
+      amount: "",
       date: "",
       accounts: [],
       unassigned: 0,
@@ -131,8 +155,42 @@ export default {
 
       return Math.round(result * 100) / 100;
     },
+    totalPercent() {
+      return this.getTotal("percent");
+    },
+    totalAmount() {
+      return this.getTotal("amount");
+    },
+    totalBalance() {
+      return this.getTotal("balance");
+    },
   },
   methods: {
+    modifyAmountByIncome() {
+      this.accounts.forEach((account) => {
+        account.amount =
+          (this.availableMoney * parseFloat(account.percent)) / 100;
+      });
+    },
+    modifyAmountByPercent(index) {
+      this.accounts[index].amount =
+        this.availableMoney * (parseFloat(this.accounts[index].percent) / 100);
+
+      this.accounts[index].amount.toString();
+    },
+    modifyPercentByAmount(index) {
+      this.accounts[index].percent =
+        (parseFloat(this.accounts[index].amount) / this.availableMoney) * 100;
+
+      this.accounts[index].percent.toString();
+    },
+    getTotal(attr) {
+      let result = 0;
+      this.accounts.forEach(
+        (account) => (result = result + parseFloat(account[attr]))
+      );
+      return result;
+    },
     editAccountRow(index) {
       if (!this.accounts[index].isEditting) {
         for (let i = 0; i < this.accounts.length; i++) {
@@ -166,6 +224,8 @@ export default {
 
       accountsData.forEach((account) => {
         account.isEditting = false;
+        account.percent = "0";
+        account.amount = "0";
       });
 
       this.accounts = dataObj.accounts;
