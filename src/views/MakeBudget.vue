@@ -33,7 +33,7 @@
 
       <h3 class="subtitle">Accounts distribution</h3>
 
-      <div class="table-account-row-carnitaasada header-account">
+      <div class="table-account-row-carnitaasada header-account edditing-row">
         <span>Account</span>
         <span>Percent</span>
         <span>Amount</span>
@@ -43,11 +43,31 @@
       <div
         v-for="(account, index) in accounts"
         class="table-account-row-carnitaasada"
+        :class="{ 'edditing-row': account.isEditting }"
+        @click="editAccountRow(index)"
         :key="index"
       >
-        <span class="start-row">{{ account.name }}</span>
-        <span>%0</span>
-        <span>$0</span>
+        <span class="start-row"
+          ><i
+            v-show="account.isEditting"
+            class="fa fa-times"
+            aria-hidden="true"
+            @click.stop="account.isEditting = false"
+          ></i
+          >{{ account.name }}</span
+        >
+        <span v-show="!account.isEditting">%0</span>
+        <div v-show="account.isEditting">
+          <input
+            :id="`percent-input-${index}`"
+            type="number"
+            @keyup.enter="account.isEditting = false"
+          />
+        </div>
+        <span v-show="!account.isEditting">$0</span>
+        <div v-show="account.isEditting">
+          <input type="number" @keyup.enter="account.isEditting = false" />
+        </div>
         <span>${{ account.balance }}</span>
       </div>
     </form>
@@ -113,23 +133,48 @@ export default {
     },
   },
   methods: {
+    editAccountRow(index) {
+      if (!this.accounts[index].isEditting) {
+        for (let i = 0; i < this.accounts.length; i++) {
+          if (i != index) {
+            this.accounts[i].isEditting = false;
+          } else {
+            this.accounts[i].isEditting = true;
+          }
+        }
+
+        const input = document.getElementById(`percent-input-${index}`);
+        setTimeout(() => input.focus(), 100);
+      }
+    },
     updateExpenseList(expenseList) {
       this.expenses = expenseList;
     },
+    loadDate() {
+      const date = new Date(Date.now());
+      let month = date.getMonth() + 1;
+      if (10 > month) {
+        month = "0" + month;
+      }
+      this.date = `${date.getFullYear()}-${month}-${date.getDate()}`;
+    },
+    loadDataFromStorage() {
+      LocalStorageManager.load();
+
+      const dataObj = JSON.parse(localStorage.getItem("data"));
+      const accountsData = dataObj.accounts;
+
+      accountsData.forEach((account) => {
+        account.isEditting = false;
+      });
+
+      this.accounts = dataObj.accounts;
+      this.unassigned = dataObj.unassigned;
+    },
   },
   created() {
-    const date = new Date(Date.now());
-    let month = date.getMonth() + 1;
-    if (10 > month) {
-      month = "0" + month;
-    }
-    this.date = `${date.getFullYear()}-${month}-${date.getDate()}`;
-
-    LocalStorageManager.load();
-
-    const dataObj = JSON.parse(localStorage.getItem("data"));
-    this.accounts = dataObj.accounts;
-    this.unassigned = dataObj.unassigned;
+    this.loadDate();
+    this.loadDataFromStorage();
   },
 };
 </script>
@@ -164,7 +209,12 @@ export default {
   display: grid;
   grid-template-columns: repeat(5, 25%);
   text-align: center;
-  margin: 15px 0;
+  margin: 20px 0;
+}
+
+.table-account-row-carnitaasada:hover {
+  cursor: pointer;
+  color: #999;
 }
 
 .header-account {
@@ -176,5 +226,35 @@ export default {
   text-align: left;
   word-wrap: break-word;
   font-size: 0.9rem;
+}
+
+.table-account-row-carnitaasada div {
+  align-items: center;
+}
+
+/* .table-account-row-carnitaasada span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+.table-account-row-carnitaasada input {
+  height: 15px;
+  width: 12vw;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.fa-times {
+  margin-right: 3px;
+}
+
+.fa-times:hover {
+  color: #dc3545;
+}
+
+.edditing-row:hover {
+  cursor: initial;
+  color: var(--color-text);
 }
 </style>
