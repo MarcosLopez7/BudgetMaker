@@ -30,31 +30,54 @@
       </span>
 
       <ExpenseList @updateExpenses="updateExpenseList" />
+
+      <h3 class="subtitle">Accounts distribution</h3>
+
+      <div class="table-account-row-carnitaasada header-account">
+        <span>Account</span>
+        <span>Percent</span>
+        <span>Amount</span>
+        <span>Blance</span>
+      </div>
+
+      <div
+        v-for="(account, index) in accounts"
+        class="table-account-row-carnitaasada"
+        :key="index"
+      >
+        <span class="start-row">{{ account.name }}</span>
+        <span>%0</span>
+        <span>$0</span>
+        <span>${{ account.balance }}</span>
+      </div>
     </form>
   </div>
 </template>
 
 <script>
-/* TODO LIST 
+/* TODO LIST
   1. Crear componente X
   2. Obtener datos del local storage de las cuentas X
   3. Obtener inputs de fecha e ingreso X
     Arreglar CSS después
   4. Renderizar monto disponible X
-  5. Creación de componente de lista de gastos 
+  5. Creación de componente de lista de gastos
     1. Renderizar lista de gastos proveniente de array
     2. Agregar, eliminar y editar lista de array
       Validar inputs de cantidad y nombre X
       Hacer CSS para errores en el input X
-      Botón para eliminar 
+      Botón para eliminar
       Modal para editar gasto
     3. Suma automática por modificación en la lista con computer X
     4. Salvar lista de gastos en el presupuesto correspondiente X
-    5. Emitir a componente padre el total de gastos
-    6. UT
-  6. Obtener total de gastos y agregar automáticamente a la lista
-  7. Renderizar tabla de cuentas para asignar por porcentaje y monto, 
-  más balance acumulado
+    5. Emitir a componente padre el total de gastos X
+    6. UT X
+  6. Obtener total de gastos y agregar automáticamente a la lista X
+  7. Renderizar tabla de cuentas para asignar por porcentaje y monto,
+  más balance acumulado X
+    1. Poner inputs en cada columna 
+    2. Poner una fila modificable
+    3. Hacer click a row para poner inputs
   8. Modificación automática de porcentajes, monto y balance
   9. Suma total de porcentaje, monto y balance
   10. Validar Inputs númericos a sólo positivos
@@ -129,5 +152,29 @@ export default {
   text-align: center;
   font-size: 24px;
   display: block;
+}
+
+.subtitle {
+  margin-top: 35px;
+  /* margin: 40px 0; */
+}
+
+/* VARIABLE CANJEADA POR EL OSO */
+.table-account-row-carnitaasada {
+  display: grid;
+  grid-template-columns: repeat(5, 25%);
+  text-align: center;
+  margin: 15px 0;
+}
+
+.header-account {
+  font-size: 1.25rem;
+  margin: 25px 0;
+}
+
+.start-row {
+  text-align: left;
+  word-wrap: break-word;
+  font-size: 0.9rem;
 }
 </style>

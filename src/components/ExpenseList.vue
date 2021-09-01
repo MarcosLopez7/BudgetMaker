@@ -2,7 +2,20 @@
   <div class="expense-list">
     <h3>Expense List</h3>
     <div class="expense-content">
-      <div class="row-list"><span>Expense</span> <span>Amount</span></div>
+      <div class="header-account row-list">
+        <span
+          >Expense
+          <button
+            type="button"
+            v-if="!isAddingExpense"
+            class="btn btn-primary icon-btn"
+            test-id="open-add-expense-button"
+            @click="isAddingExpense = !isAddingExpense"
+          >
+            <i class="fa fa-plus" aria-hidden="true"></i></button
+        ></span>
+        <span>Amount</span>
+      </div>
       <div
         class="row-list expense-item"
         v-for="(expense, index) in expenses"
@@ -17,15 +30,6 @@
         <span>Total</span><span test-id="total-sum">${{ totalExpense }}</span>
       </div>
     </div>
-    <button
-      type="button"
-      v-if="!isAddingExpense"
-      class="btn btn-primary"
-      test-id="open-add-expense-button"
-      @click="isAddingExpense = !isAddingExpense"
-    >
-      Add Expense
-    </button>
     <div v-if="isAddingExpense" class="input-expense">
       <div class="header-input">
         <span>Expense edit</span>
@@ -247,5 +251,10 @@ h3 {
 .total-expense {
   margin: 20px 0;
   font-size: 22px;
+}
+
+.icon-btn {
+  padding: 0px 5px;
+  height: 23px;
 }
 </style>

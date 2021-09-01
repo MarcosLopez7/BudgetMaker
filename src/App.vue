@@ -69,7 +69,7 @@ export default {
 body {
   background-color: var(--bg-color);
   color: var(--color-text);
-  font-size: 18px;
+  font-size: 1rem;
   margin: 0;
   font-family: "Lato", sans-serif;
   font-weight: 300;
