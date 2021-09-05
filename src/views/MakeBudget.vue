@@ -27,7 +27,7 @@
       </div>
 
       <span class="available-money">
-        Money available: ${{ availableMoney }}
+        Available Money: ${{ availableMoney }}
       </span>
 
       <ExpenseList @updateExpenses="updateExpenseList" />
@@ -54,33 +54,43 @@
           <input
             :id="`percent-input-${index}`"
             class="editting-row-input"
+            :class="{ 'input-error': account.errorPercentInput !== '' }"
             v-model="account.percent"
             type="number"
-            @keyup.enter="account.isEditting = false"
+            @keyup.enter="closeEditting(index)"
             @input="modifyAmountByPercent(index)"
           />
+          <span v-show="account.errorPercentInput !== ''" class="field-error">
+            {{ account.errorPercentInput }}
+          </span>
         </div>
         <span v-show="!account.isEditting">${{ account.amount }}</span>
         <div v-show="account.isEditting">
           <input
             class="editting-row-input"
+            :class="{ 'input-error': account.errorAmountInput !== '' }"
             v-model="account.amount"
             type="number"
-            @keyup.enter="account.isEditting = false"
+            @keyup.enter="closeEditting(index)"
             @input="modifyPercentByAmount(index)"
           />
+          <span v-show="account.errorAmountInput !== ''" class="field-error">
+            {{ account.errorAmountInput }}
+          </span>
         </div>
         <span
           >${{
-            (parseFloat(account.amount) + parseFloat(account.balance)).toFixed(
-              2
-            )
+            account.amount !== ""
+              ? (
+                  parseFloat(account.amount) + parseFloat(account.balance)
+                ).toFixed(2)
+              : parseFloat(account.balance)
           }}</span
         >
       </div>
       <div class="table-account-row-carnitaasada total-row">
         <span class="start-row">Total</span>
-        <span>%{{ totalPercent }}</span>
+        <span>%{{ totalPercent.toFixed(2) }}</span>
         <span>${{ totalAmount }}</span>
         <span>${{ totalBalance }}</span>
       </div>
@@ -113,7 +123,7 @@
     2. Poner una fila modificable X
     3. Hacer click a row para poner inputs X
 
-  TRATAR DE CERRAR LA EDICIÒN FILA DANDO LE CLICK A OTRO LADO EN VEZ DE USAR EL TACHE
+  TRATAR DE CERRAR LA EDICIÒN FILA DANDO LE CLICK A OTRO LADO EN VEZ DE USAR EL TACHE X
 
   8. Modificación automática de porcentajes, monto y balance
     1. Validar que no se envien strings por ningun input y mandar 0 u otro numero a las modificaciones
@@ -159,30 +169,40 @@ export default {
       return this.getTotal("balance");
     },
     isEditting() {
-      let editting = false;
-
-      this.accounts.forEach((account) => {
-        if (account.isEditting) {
-          editting = true;
+      for (let i = 0; i < this.accounts.length; i++) {
+        if (this.accounts[i].isEditting) {
+          return true;
         }
-      });
+      }
 
-      return editting;
+      return false;
+    },
+    hasError() {
+      for (let i = 0; i < this.accounts.length; i++) {
+        if (
+          this.accounts[i].errorPercentInput !== "" ||
+          this.accounts[i].errorAmountInput !== ""
+        ) {
+          return true;
+        }
+      }
+
+      return false;
     },
   },
   methods: {
+    closeEditting(index) {
+      if (!this.hasError) {
+        this.accounts[index].isEditting = false;
+      }
+    },
     closeAccountRow(e) {
-      console.log(e.target);
       const edittingRowDiv = document.getElementsByClassName("edditing-row")[0];
-      console.log(
-        edittingRowDiv !== undefined &&
-          !e.target.classList.contains("editting-row-input") &&
-          this.isEditting
-      );
       if (
         edittingRowDiv !== undefined &&
         !e.target.classList.contains("editting-row-input") &&
-        this.isEditting
+        this.isEditting &&
+        !this.hasError
       ) {
         for (let i = 0; i < this.accounts.length; i++) {
           this.accounts[i].isEditting = false;
@@ -196,16 +216,66 @@ export default {
       });
     },
     modifyAmountByPercent(index) {
-      this.accounts[index].amount =
-        this.availableMoney * (parseFloat(this.accounts[index].percent) / 100);
+      let error = false;
 
-      this.accounts[index].amount.toString();
+      if (this.accounts[index].percent === "") {
+        this.accounts[index].amount = "0";
+        this.accounts[index].errorPercentInput = "Insert a percent";
+        error = true;
+      }
+
+      if (
+        parseFloat(this.accounts[index].percent) > 100 ||
+        parseFloat(this.accounts[index].percent) < 0
+      ) {
+        this.accounts[index].errorPercentInput =
+          "Percent must be between 0 - 100";
+        error = true;
+      }
+
+      if (!error) {
+        this.accounts[index].amount =
+          this.availableMoney *
+          (parseFloat(this.accounts[index].percent) / 100);
+
+        this.accounts[index].amount.toString();
+        this.accounts[index].errorPercentInput = "";
+      }
     },
     modifyPercentByAmount(index) {
-      this.accounts[index].percent =
-        (parseFloat(this.accounts[index].amount) / this.availableMoney) * 100;
+      let error = false;
 
-      this.accounts[index].percent.toString();
+      if (this.accounts[index].amount === "") {
+        this.accounts[index].percent = "0";
+        this.accounts[index].errorAmountInput = "Insert an amount";
+        error = true;
+      }
+
+      if (parseFloat(this.accounts[index].amount) < 0) {
+        this.accounts[index].percent = "0";
+        this.accounts[index].errorAmountInput =
+          "Negative numbers aren't allowes";
+        error = true;
+      }
+
+      if (parseFloat(this.accounts[index].amount) > this.availableMoney) {
+        this.accounts[index].errorAmountInput =
+          "Amount must be lower than available money";
+        error = true;
+      }
+
+      if (!error) {
+        if (this.availableMoney != 0) {
+          this.accounts[index].percent =
+            (parseFloat(this.accounts[index].amount) / this.availableMoney) *
+            100;
+
+          this.accounts[index].percent.toString();
+        } else {
+          this.accounts[index].percent = "0";
+        }
+        this.accounts[index].errorAmountInput = "";
+      }
     },
     getTotal(attr) {
       let result = 0;
@@ -215,20 +285,22 @@ export default {
       return result;
     },
     editAccountRow(index) {
-      setTimeout(() => {
-        if (!this.accounts[index].isEditting) {
-          for (let i = 0; i < this.accounts.length; i++) {
-            if (i != index) {
-              this.accounts[i].isEditting = false;
-            } else {
-              this.accounts[i].isEditting = true;
+      if (!this.hasError) {
+        setTimeout(() => {
+          if (!this.accounts[index].isEditting) {
+            for (let i = 0; i < this.accounts.length; i++) {
+              if (i != index) {
+                this.accounts[i].isEditting = false;
+              } else {
+                this.accounts[i].isEditting = true;
+              }
             }
-          }
 
-          const input = document.getElementById(`percent-input-${index}`);
-          setTimeout(() => input.focus(), 25);
-        }
-      }, 25);
+            const input = document.getElementById(`percent-input-${index}`);
+            setTimeout(() => input.focus(), 25);
+          }
+        }, 25);
+      }
     },
     updateExpenseList(expenseList) {
       this.expenses = expenseList;
@@ -251,6 +323,8 @@ export default {
         account.isEditting = false;
         account.percent = "0";
         account.amount = "0";
+        account.errorPercentInput = "";
+        account.errorAmountInput = "";
       });
 
       this.accounts = dataObj.accounts;
@@ -315,6 +389,7 @@ export default {
 
 .table-account-row-carnitaasada div {
   align-items: center;
+  padding: 0 10px;
 }
 
 /* .table-account-row-carnitaasada span {
@@ -325,7 +400,7 @@ export default {
 
 .table-account-row-carnitaasada input {
   height: 15px;
-  width: 12vw;
+  width: 100%;
   margin: 0;
   font-size: 0.9rem;
 }
@@ -351,5 +426,9 @@ export default {
 .total-row:hover {
   cursor: initial;
   color: var(--color-text);
+}
+
+.field-error {
+  font-size: 10px;
 }
 </style>

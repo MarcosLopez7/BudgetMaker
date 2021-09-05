@@ -194,7 +194,7 @@ h1 {
 }
 
 .input-error {
-  border: #dc3545;
+  border: #dc3545 2px;
   border-style: inset;
 }
 
