@@ -1,5 +1,5 @@
 <template>
-  <div class="add-income">
+  <div class="add-income" @click="closeAccountRow($event)">
     <h2 class="title">Make Budget</h2>
     <form>
       <div class="form-field">
@@ -34,7 +34,7 @@
 
       <h3 class="subtitle">Accounts distribution</h3>
 
-      <div class="table-account-row-carnitaasada header-account edditing-row">
+      <div class="table-account-row-carnitaasada header-account">
         <span>Account</span>
         <span>Percent</span>
         <span>Amount</span>
@@ -48,19 +48,12 @@
         @click="editAccountRow(index)"
         :key="index"
       >
-        <span class="start-row"
-          ><i
-            v-show="account.isEditting"
-            class="fa fa-times"
-            aria-hidden="true"
-            @click.stop="account.isEditting = false"
-          ></i
-          >{{ account.name }}</span
-        >
+        <span class="start-row">{{ account.name }}</span>
         <span v-show="!account.isEditting">%{{ account.percent }}</span>
         <div v-show="account.isEditting">
           <input
             :id="`percent-input-${index}`"
+            class="editting-row-input"
             v-model="account.percent"
             type="number"
             @keyup.enter="account.isEditting = false"
@@ -70,6 +63,7 @@
         <span v-show="!account.isEditting">${{ account.amount }}</span>
         <div v-show="account.isEditting">
           <input
+            class="editting-row-input"
             v-model="account.amount"
             type="number"
             @keyup.enter="account.isEditting = false"
@@ -84,7 +78,7 @@
           }}</span
         >
       </div>
-      <div class="table-account-row-carnitaasada edditing-row">
+      <div class="table-account-row-carnitaasada total-row">
         <span class="start-row">Total</span>
         <span>%{{ totalPercent }}</span>
         <span>${{ totalAmount }}</span>
@@ -164,8 +158,37 @@ export default {
     totalBalance() {
       return this.getTotal("balance");
     },
+    isEditting() {
+      let editting = false;
+
+      this.accounts.forEach((account) => {
+        if (account.isEditting) {
+          editting = true;
+        }
+      });
+
+      return editting;
+    },
   },
   methods: {
+    closeAccountRow(e) {
+      console.log(e.target);
+      const edittingRowDiv = document.getElementsByClassName("edditing-row")[0];
+      console.log(
+        edittingRowDiv !== undefined &&
+          !e.target.classList.contains("editting-row-input") &&
+          this.isEditting
+      );
+      if (
+        edittingRowDiv !== undefined &&
+        !e.target.classList.contains("editting-row-input") &&
+        this.isEditting
+      ) {
+        for (let i = 0; i < this.accounts.length; i++) {
+          this.accounts[i].isEditting = false;
+        }
+      }
+    },
     modifyAmountByIncome() {
       this.accounts.forEach((account) => {
         account.amount =
@@ -192,18 +215,20 @@ export default {
       return result;
     },
     editAccountRow(index) {
-      if (!this.accounts[index].isEditting) {
-        for (let i = 0; i < this.accounts.length; i++) {
-          if (i != index) {
-            this.accounts[i].isEditting = false;
-          } else {
-            this.accounts[i].isEditting = true;
+      setTimeout(() => {
+        if (!this.accounts[index].isEditting) {
+          for (let i = 0; i < this.accounts.length; i++) {
+            if (i != index) {
+              this.accounts[i].isEditting = false;
+            } else {
+              this.accounts[i].isEditting = true;
+            }
           }
-        }
 
-        const input = document.getElementById(`percent-input-${index}`);
-        setTimeout(() => input.focus(), 100);
-      }
+          const input = document.getElementById(`percent-input-${index}`);
+          setTimeout(() => input.focus(), 25);
+        }
+      }, 25);
     },
     updateExpenseList(expenseList) {
       this.expenses = expenseList;
@@ -314,6 +339,16 @@ export default {
 }
 
 .edditing-row:hover {
+  cursor: initial;
+  color: var(--color-text);
+}
+
+.header-account:hover {
+  cursor: initial;
+  color: var(--color-text);
+}
+
+.total-row:hover {
   cursor: initial;
   color: var(--color-text);
 }
