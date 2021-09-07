@@ -8,12 +8,18 @@
           id="amountIncome"
           type="number"
           class="form-control"
+          :class="{ 'input-error': amount.errorMessage !== '' }"
           placeholder="Amount"
-          v-model="amountInput"
+          v-model="amount.input"
           min="0"
           @input="modifyAmountByIncome()"
           required
         />
+        <span
+          class="field-error amount-input-error"
+          v-show="amount.errorMessage !== ''"
+          >{{ amount.errorMessage }}</span
+        >
       </div>
       <div class="form-field">
         <label for="cutOffDate">Cut Off Date</label>
@@ -138,9 +144,9 @@
         - Si es un espacio en blanco, mostrar mensaje de 
           error de no dejar el campo vacio, el computed 
           de available money se manda 0, no se va poder modificar
-          porcentages o cantidades
-        - Si el input es negativo, no se modifican las cantidades
-        - La cantidad mínima válida es de 1
+          porcentages o cantidades X
+        - Si el input es negativo, no se modifican las cantidades X
+        - La cantidad mínima válida es de 1 X
         - Si había errores en porcentaje, tomar porcentajes como 0
         - Si hay errores en porcentajes o cantidades, limpiarlos
       2. El usuario modifica un porcentaje
@@ -179,7 +185,10 @@ export default {
   },
   data() {
     return {
-      amountInput: "",
+      amount: {
+        input: "",
+        errorMessage: "",
+      },
       date: "",
       accounts: [],
       unassigned: 0,
@@ -190,8 +199,8 @@ export default {
     availableMoney() {
       let result = this.unassigned;
 
-      if (this.amountInput !== "") {
-        result += this.amountInput;
+      if (this.amount.input !== "") {
+        result += this.amount.input;
       }
 
       return Math.round(result * 100) / 100;
@@ -226,13 +235,21 @@ export default {
 
       return false;
     },
-    amountIncomeHasError() {
-      // if (this.amountInput)
-
-      return false;
-    },
   },
   methods: {
+    isValidateAmountIncome() {
+      if (this.amount.input === "") {
+        this.amount.errorMessage = "Please, insert an amount for the income";
+        return false;
+      }
+
+      if (parseFloat(this.amount.input) < 1) {
+        this.amount.errorMessage = "The minimun value for the income is 1";
+        return false;
+      }
+
+      return true;
+    },
     closeEditting(index) {
       if (!this.hasError) {
         this.accounts[index].isEditting = false;
@@ -252,10 +269,20 @@ export default {
       }
     },
     modifyAmountByIncome() {
-      this.accounts.forEach((account) => {
-        account.amount =
-          (this.availableMoney * parseFloat(account.percent)) / 100;
-      });
+      if (this.isValidateAmountIncome()) {
+        this.amount.errorMessage = "";
+        this.accounts.forEach((account) => {
+          if (account.percent !== "" && parseFloat(account.percent) >= 0) {
+            account.amount =
+              (this.availableMoney * parseFloat(account.percent)) / 100;
+          } else {
+            account.amount = 0;
+            account.percent = 0;
+            account.errorAmountInput = "";
+            account.errorPercentInput = "";
+          }
+        });
+      }
     },
     modifyAmountByPercent(index) {
       let error = false;
@@ -327,7 +354,7 @@ export default {
       return result;
     },
     editAccountRow(index) {
-      if (!this.hasError) {
+      if (!this.hasError && this.isValidateAmountIncome()) {
         setTimeout(() => {
           if (!this.accounts[index].isEditting) {
             for (let i = 0; i < this.accounts.length; i++) {
@@ -472,5 +499,9 @@ export default {
 
 .field-error {
   font-size: 10px;
+}
+
+.amount-input-error {
+  font-size: 14px;
 }
 </style>
