@@ -50,7 +50,10 @@
       <div
         v-for="(account, index) in accounts"
         class="table-account-row-carnitaasada"
-        :class="{ 'edditing-row': account.isEditting }"
+        :class="[
+          account.isEditting ? 'edditing-row' : '',
+          account.default ? 'total-row' : '',
+        ]"
         @click="editAccountRow(index)"
         :key="index"
       >
@@ -147,22 +150,23 @@
           porcentages o cantidades X
         - Si el input es negativo, no se modifican las cantidades X
         - La cantidad mínima válida es de 1 X
-        - Si había errores en porcentaje, tomar porcentajes como 0
-        - Si hay errores en porcentajes o cantidades, limpiarlos
+        - Si había errores en porcentaje, tomar porcentajes como 0 X
+        - Si hay errores en porcentajes o cantidades, limpiarlos X
       2. El usuario modifica un porcentaje
-        - Se modifica automáticamente la cantidad
-        - La cantidad válida es de 0 a 100
+        - Se modifica automáticamente la cantidad X
+        - La cantidad válida es de 0 a 100 X
         - Si el campo es vacio, la cantidad es 0, el total de porcentaje 
-          lo toma como 0
+          lo toma como 0 X
         - Si el número es negativo o mayor al 100 no se modifica la cantidad, 
-          el total de porcentaje lo toma como 0
+          el total de porcentaje lo toma como 0 x
+        - Limpiar error en cantidad, cuando se modifique porcentaje X
       3. Si el usuario modifica la cantidad
-        - Se modifica automáticamente el porcentaje
-        - La cantidad válida es de 0 a la cantidad de dinero disponible
+        - Se modifica automáticamente el porcentaje X
+        - La cantidad válida es de 0 a la cantidad de dinero disponible X
         - Si la cantidad es vacio, el porcentaje pasa a 0, la suma total 
-          lo toma como 0
+          lo toma como 0 X
         - Si la cantidad es negativa, el porcentaje pasa a 0, la suma total
-          lo toma como 0
+          lo toma como 0 X
       4. Validaciòn general
         - El porcentaje no debe pasar del 100%
         - Se tiene que validar todo lo anterior
@@ -170,8 +174,8 @@
         - El porcentaje que pueda sobrar se va a unassigned 
 
 
-  9. Suma total de porcentaje, monto y balance
-  10. Validar Inputs númericos a sólo positivos
+  9. Suma total de porcentaje, monto y balance X
+  10. Validar Inputs númericos a sólo positivos X
   11. Validar que no se asigne mayor presupuesto
   12. Guardar en localStorage presupuesto
   13. UT
@@ -235,6 +239,11 @@ export default {
 
       return false;
     },
+    totalExpenses() {
+      let result = 0;
+      this.expenses.forEach((expense) => (result = result + expense.amount));
+      return result;
+    },
   },
   methods: {
     isValidateAmountIncome() {
@@ -273,11 +282,20 @@ export default {
         this.amount.errorMessage = "";
         this.accounts.forEach((account) => {
           if (account.percent !== "" && parseFloat(account.percent) >= 0) {
-            account.amount =
-              (this.availableMoney * parseFloat(account.percent)) / 100;
+            if (!account.default) {
+              account.amount =
+                (this.availableMoney * parseFloat(account.percent)) / 100;
+              account.amount = account.amount.toFixed(2);
+            } else {
+              account.percent =
+                (parseFloat(account.amount) / this.availableMoney) * 100;
+              account.percent = account.percent.toFixed(2);
+            }
           } else {
-            account.amount = 0;
-            account.percent = 0;
+            if (!account.defaul) {
+              account.amount = "0";
+            }
+            account.percent = "0";
             account.errorAmountInput = "";
             account.errorPercentInput = "";
           }
@@ -307,8 +325,9 @@ export default {
           this.availableMoney *
           (parseFloat(this.accounts[index].percent) / 100);
 
-        this.accounts[index].amount.toString();
+        this.accounts[index].amount = this.accounts[index].amount.toFixed(2);
         this.accounts[index].errorPercentInput = "";
+        this.accounts[index].errorAmountInput = "";
       }
     },
     modifyPercentByAmount(index) {
@@ -327,7 +346,10 @@ export default {
         error = true;
       }
 
-      if (parseFloat(this.accounts[index].amount) > this.availableMoney) {
+      if (
+        parseFloat(this.accounts[index].amount) > this.availableMoney &&
+        !this.accounts[index].default
+      ) {
         this.accounts[index].errorAmountInput =
           "Amount must be lower than available money";
         error = true;
@@ -338,8 +360,8 @@ export default {
           this.accounts[index].percent =
             (parseFloat(this.accounts[index].amount) / this.availableMoney) *
             100;
-
-          this.accounts[index].percent.toString();
+          this.accounts[index].percent =
+            this.accounts[index].percent.toFixed(2);
         } else {
           this.accounts[index].percent = "0";
         }
@@ -348,13 +370,19 @@ export default {
     },
     getTotal(attr) {
       let result = 0;
-      this.accounts.forEach(
-        (account) => (result = result + parseFloat(account[attr]))
-      );
+      this.accounts.forEach((account) => {
+        if (account[attr] !== "" && parseFloat(account[attr]) >= 0) {
+          result = result + parseFloat(account[attr]);
+        }
+      });
       return result;
     },
     editAccountRow(index) {
-      if (!this.hasError && this.isValidateAmountIncome()) {
+      if (
+        !this.hasError &&
+        this.isValidateAmountIncome() &&
+        !this.accounts[index].default
+      ) {
         setTimeout(() => {
           if (!this.accounts[index].isEditting) {
             for (let i = 0; i < this.accounts.length; i++) {
@@ -373,6 +401,14 @@ export default {
     },
     updateExpenseList(expenseList) {
       this.expenses = expenseList;
+
+      for (let i = 0; i < this.accounts.length; i++) {
+        if (this.accounts[i].default) {
+          this.accounts[i].amount = this.totalExpenses;
+          this.modifyPercentByAmount(i);
+          break;
+        }
+      }
     },
     loadDate() {
       const date = new Date(Date.now());

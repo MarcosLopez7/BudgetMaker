@@ -141,7 +141,7 @@ export default {
           this.expenses[this.edditingIndex] = expenseObject;
         }
 
-        this.$emit("updateExpenses", this.expense);
+        this.$emit("updateExpenses", this.expenses);
         this.cleanInputs();
       }
     },
