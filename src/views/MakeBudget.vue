@@ -9,7 +9,7 @@
           type="number"
           class="form-control"
           placeholder="Amount"
-          v-model="amount"
+          v-model="amountInput"
           min="0"
           @input="modifyAmountByIncome()"
           required
@@ -124,9 +124,46 @@
     3. Hacer click a row para poner inputs X
 
   TRATAR DE CERRAR LA EDICIÒN FILA DANDO LE CLICK A OTRO LADO EN VEZ DE USAR EL TACHE X
+  
+  HACER CAMBIO AUTOMÀTICO DE EDITAR LA SIGUIENTE CUENTA DESPUES DE HACER TAB
+
 
   8. Modificación automática de porcentajes, monto y balance
     1. Validar que no se envien strings por ningun input y mandar 0 u otro numero a las modificaciones
+
+    LISTA DE VALIDACIONES
+      1. El usuario modifica el amount income
+        - Automáticamente las cantidades se modifican en 
+          base a los porcentajes de cada cuenta, excepto la cuenta de gastos X
+        - Si es un espacio en blanco, mostrar mensaje de 
+          error de no dejar el campo vacio, el computed 
+          de available money se manda 0, no se va poder modificar
+          porcentages o cantidades
+        - Si el input es negativo, no se modifican las cantidades
+        - La cantidad mínima válida es de 1
+        - Si había errores en porcentaje, tomar porcentajes como 0
+        - Si hay errores en porcentajes o cantidades, limpiarlos
+      2. El usuario modifica un porcentaje
+        - Se modifica automáticamente la cantidad
+        - La cantidad válida es de 0 a 100
+        - Si el campo es vacio, la cantidad es 0, el total de porcentaje 
+          lo toma como 0
+        - Si el número es negativo o mayor al 100 no se modifica la cantidad, 
+          el total de porcentaje lo toma como 0
+      3. Si el usuario modifica la cantidad
+        - Se modifica automáticamente el porcentaje
+        - La cantidad válida es de 0 a la cantidad de dinero disponible
+        - Si la cantidad es vacio, el porcentaje pasa a 0, la suma total 
+          lo toma como 0
+        - Si la cantidad es negativa, el porcentaje pasa a 0, la suma total
+          lo toma como 0
+      4. Validaciòn general
+        - El porcentaje no debe pasar del 100%
+        - Se tiene que validar todo lo anterior
+        - Se debe confirmar al usuario si está seguro de guardar el presupuesto
+        - El porcentaje que pueda sobrar se va a unassigned 
+
+
   9. Suma total de porcentaje, monto y balance
   10. Validar Inputs númericos a sólo positivos
   11. Validar que no se asigne mayor presupuesto
@@ -142,7 +179,7 @@ export default {
   },
   data() {
     return {
-      amount: "",
+      amountInput: "",
       date: "",
       accounts: [],
       unassigned: 0,
@@ -153,8 +190,8 @@ export default {
     availableMoney() {
       let result = this.unassigned;
 
-      if (this.amount !== "") {
-        result += this.amount;
+      if (this.amountInput !== "") {
+        result += this.amountInput;
       }
 
       return Math.round(result * 100) / 100;
@@ -166,7 +203,7 @@ export default {
       return this.getTotal("amount");
     },
     totalBalance() {
-      return this.getTotal("balance");
+      return this.getTotal("balance") + this.totalAmount;
     },
     isEditting() {
       for (let i = 0; i < this.accounts.length; i++) {
@@ -186,6 +223,11 @@ export default {
           return true;
         }
       }
+
+      return false;
+    },
+    amountIncomeHasError() {
+      // if (this.amountInput)
 
       return false;
     },
