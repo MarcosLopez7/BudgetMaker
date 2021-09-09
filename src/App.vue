@@ -25,6 +25,9 @@
     <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
   </nav>
   <router-view />
+  <footer>
+    <br />
+  </footer>
 </template>
 
 <script>

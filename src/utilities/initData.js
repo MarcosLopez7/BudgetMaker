@@ -7,5 +7,6 @@ export const data = {
     { name: "Savings", balance: 250, default: false },
     { name: "Investments", balance: 150, default: false },
   ],
-  unassigned: 10,
+  unassigned: 0,
+  budgets: [],
 };

@@ -29,9 +29,16 @@
           id="cutOffDate"
           type="date"
           class="form-control"
+          :class="{ 'input-error': !isValidDate }"
           v-model="date"
           required
         />
+        <span
+          test-id="date-input-error-msg"
+          class="field-error amount-input-error"
+          v-show="!isValidDate"
+          >Please, insert a valid date</span
+        >
       </div>
 
       <span test-id="available-money" class="available-money">
@@ -44,9 +51,17 @@
         ref="AccountDistribution"
         :availableMoney="availableMoney"
         :isValidAmountIncome="isValideIncome"
-        v-model:accounts="accounts"
+        :accounts="accounts"
         :totalExpenses="totalExpenses"
       />
+
+      <button
+        type="button"
+        class="btn btn-primary submit-btn-Brasil_Espanha"
+        @click="submit()"
+      >
+        Submit
+      </button>
     </form>
   </div>
 </template>
@@ -120,7 +135,7 @@
 
   9. Suma total de porcentaje, monto y balance X
   10. Validar Inputs númericos a sólo positivos X
-  11. Validar que no se asigne mayor presupuesto
+  11. Validar que no se asigne mayor presupuesto 
   12. Guardar en localStorage presupuesto
   13. UT
 */
@@ -163,6 +178,32 @@ export default {
     isValideIncome() {
       return this.amount.errorMessage === "" && this.amount.input !== "";
     },
+    currentDay() {
+      const date = new Date(Date.now());
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      if (10 > month) {
+        month = "0" + month;
+      }
+
+      if (10 > day) {
+        day = "0" + day;
+      }
+
+      return `${date.getFullYear()}-${month}-${day}`;
+    },
+    isValidDate() {
+      return this.date >= this.currentDay;
+    },
+    getTotal() {
+      let result = 0;
+      this.accounts.forEach((account) => {
+        if (account["amount"] !== "" && parseFloat(account["amount"]) >= 0) {
+          result = result + parseFloat(account["amount"]);
+        }
+      });
+      return result;
+    },
   },
   methods: {
     isValidateAmountIncome() {
@@ -190,12 +231,7 @@ export default {
       this.expenses = expenseList;
     },
     loadDate() {
-      const date = new Date(Date.now());
-      let month = date.getMonth() + 1;
-      if (10 > month) {
-        month = "0" + month;
-      }
-      this.date = `${date.getFullYear()}-${month}-${date.getDate()}`;
+      this.date = this.currentDay;
     },
     loadDataFromStorage() {
       LocalStorageManager.load();
@@ -213,6 +249,34 @@ export default {
 
       this.accounts = dataObj.accounts;
       this.unassigned = dataObj.unassigned;
+    },
+    submit() {
+      if (this.isisValideIncome && this.isValidDate) {
+        const dataObj = JSON.parse(localStorage.getItem("data"));
+        // const budgetData = dataObj.budgets;
+        const id = dataObj.budgetData.length + 1;
+
+        const unassigned = this.availableMoney - this.getTotal;
+        dataObj.unassigned = dataObj.unassigned + unassigned;
+
+        dataObj.budgetData.push({
+          id: id,
+          expenses: this.expenses,
+          accounts: this.accounts,
+          income: parseFloat(this.amount.input),
+          date: this.currentDay,
+          cuttOffDay: this.date,
+        });
+
+        for (let i = 0; i < this.accounts.length; i++) {
+          dataObj.accounts[i].balance =
+            dataObj.accounts[i].balance + this.accounts[i].amount;
+        }
+
+        const dataJSON = JSON.stringify(dataObj);
+
+        localStorage.setItem("data", dataJSON);
+      }
     },
   },
   created() {
@@ -318,5 +382,10 @@ export default {
 
 .amount-input-error {
   font-size: 14px;
+}
+
+.submit-btn-Brasil_Espanha {
+  display: flex;
+  margin: 0 auto;
 }
 </style>
