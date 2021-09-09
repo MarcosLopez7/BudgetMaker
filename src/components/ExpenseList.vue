@@ -191,7 +191,7 @@ export default {
     },
     removeExpense() {
       this.expenses.splice(this.edditingIndex, 1);
-      this.$emit("updateExpenses", this.expense);
+      this.$emit("updateExpenses", this.expenses);
       this.cleanInputs();
     },
   },

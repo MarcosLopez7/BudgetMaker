@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 <template>
   <div
     class="table-account-row-carnitaasada"
@@ -63,27 +64,50 @@ export default {
       type: Object,
       required: true,
     },
-    index: {
-      type: Number,
+    dataCMP: {
+      type: Object,
       required: true,
     },
-    availableMoney: {
-      type: Number,
-      required: true,
+  },
+  computed: {
+    availableMoney() {
+      return this.dataCMP.availableMoney;
     },
-    hasError: {
-      type: Boolean,
-      required: true,
-    },
-    isValidAmountIncome: {
-      type: Boolean,
-      required: true,
+    totalExpenses() {
+      return this.dataCMP.totalExpenses;
     },
   },
   methods: {
     closeEditting() {
-      if (!this.hasError) {
+      if (!this.dataCMP.hasError) {
         this.account.isEditting = false;
+      }
+    },
+    modifyAmountByIncome() {
+      if (this.dataCMP.isValidAmountIncome) {
+        if (
+          this.account.percent !== "" &&
+          parseFloat(this.account.percent) >= 0
+        ) {
+          if (!this.account.default) {
+            this.account.amount =
+              (this.dataCMP.availableMoney * parseFloat(this.account.percent)) /
+              100;
+            this.account.amount = this.account.amount.toFixed(2);
+          } else {
+            this.account.percent =
+              (parseFloat(this.account.amount) / this.dataCMP.availableMoney) *
+              100;
+            this.account.percent = this.account.percent.toFixed(2);
+          }
+        } else {
+          if (!this.account.defaul) {
+            this.account.amount = "0";
+          }
+          this.account.percent = "0";
+          this.account.errorAmountInput = "";
+          this.account.errorPercentInput = "";
+        }
       }
     },
     modifyAmountByPercent() {
@@ -105,7 +129,8 @@ export default {
 
       if (!error) {
         this.account.amount =
-          this.availableMoney * (parseFloat(this.account.percent) / 100);
+          this.dataCMP.availableMoney *
+          (parseFloat(this.account.percent) / 100);
 
         this.account.amount = this.account.amount.toFixed(2);
         this.account.errorPercentInput = "";
@@ -128,7 +153,7 @@ export default {
       }
 
       if (
-        parseFloat(this.account.amount) > this.availableMoney &&
+        parseFloat(this.account.amount) > this.dataCMP.availableMoney &&
         !this.account.default
       ) {
         this.account.errorAmountInput =
@@ -137,9 +162,10 @@ export default {
       }
 
       if (!error) {
-        if (this.availableMoney != 0) {
+        if (this.dataCMP.availableMoney != 0) {
           this.account.percent =
-            (parseFloat(this.account.amount) / this.availableMoney) * 100;
+            (parseFloat(this.account.amount) / this.dataCMP.availableMoney) *
+            100;
           this.account.percent = this.account.percent.toFixed(2);
         } else {
           this.account.percent = "0";
@@ -148,7 +174,11 @@ export default {
       }
     },
     editAccountRow(index) {
-      if (!this.hasError && this.isValidAmountIncome && !this.account.default) {
+      if (
+        !this.dataCMP.hasError &&
+        this.dataCMP.isValidAmountIncome &&
+        !this.account.default
+      ) {
         setTimeout(() => {
           if (!this.account.isEditting) {
             this.account.isEditting = true;
@@ -157,6 +187,19 @@ export default {
             setTimeout(() => input.focus(), 25);
           }
         }, 25);
+      }
+    },
+  },
+  watch: {
+    // eslint-disable-next-line no-unused-vars
+    availableMoney(newValue, oldVlue) {
+      this.modifyAmountByIncome();
+    },
+    // eslint-disable-next-line no-unused-vars
+    totalExpenses(newValue, oldVlue) {
+      if (this.account.default) {
+        this.account.amount = this.dataCMP.totalExpenses;
+        this.modifyPercentByAmount();
       }
     },
   },
