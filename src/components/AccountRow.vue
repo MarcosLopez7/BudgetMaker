@@ -152,13 +152,6 @@ export default {
         setTimeout(() => {
           if (!this.account.isEditting) {
             this.account.isEditting = true;
-            // for (let i = 0; i < this.accounts.length; i++) {
-            //   if (i != index) {
-            //     this.accounts[i].isEditting = false;
-            //   } else {
-            //     this.accounts[i].isEditting = true;
-            //   }
-            // }
 
             const input = document.getElementById(`percent-input-${index}`);
             setTimeout(() => input.focus(), 25);

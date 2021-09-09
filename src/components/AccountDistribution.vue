@@ -9,6 +9,7 @@
       <span>Blance</span>
     </div>
 
+    <!-- MANDAR OBJETO COMO PARAMETRO Y QUITAR VARIABLES -->
     <AccountRow
       v-for="(account, index) in accounts"
       :account="account"
@@ -18,62 +19,6 @@
       :hasError="hasError"
       :key="index"
     />
-
-    <!-- <div
-      v-for="(account, index) in accounts"
-      class="table-account-row-carnitaasada"
-      test-id="row-account-test"
-      :class="[
-        account.isEditting ? 'edditing-row' : '',
-        account.default ? 'total-row' : '',
-      ]"
-      @click="editAccountRow(index)"
-      :key="index"
-    >
-      <span class="start-row">{{ account.name }}</span>
-      <span test-id="account-percent-test" v-show="!account.isEditting"
-        >%{{ account.percent }}</span
-      >
-      <div v-show="account.isEditting">
-        <input
-          :id="`percent-input-${index}`"
-          class="editting-row-input"
-          :class="{ 'input-error': account.errorPercentInput !== '' }"
-          v-model="account.percent"
-          type="number"
-          @keyup.enter="closeEditting(index)"
-          @input="modifyAmountByPercent(index)"
-        />
-        <span v-show="account.errorPercentInput !== ''" class="field-error">
-          {{ account.errorPercentInput }}
-        </span>
-      </div>
-      <span test-id="account-amount-test" v-show="!account.isEditting"
-        >${{ account.amount }}</span
-      >
-      <div v-show="account.isEditting">
-        <input
-          class="editting-row-input"
-          :class="{ 'input-error': account.errorAmountInput !== '' }"
-          v-model="account.amount"
-          type="number"
-          @keyup.enter="closeEditting(index)"
-          @input="modifyPercentByAmount(index)"
-        />
-        <span v-show="account.errorAmountInput !== ''" class="field-error">
-          {{ account.errorAmountInput }}
-        </span>
-      </div>
-      <span
-        >${{
-          account.amount !== ""
-            ? (
-                parseFloat(account.amount) + parseFloat(account.balance)
-              ).toFixed(2)
-            : parseFloat(account.balance)
-        }}</span
-      >
-    </div> -->
     <div class="table-account-row-carnitaasada total-row">
       <span class="start-row">Total</span>
       <span test-id="total-percent-test">%{{ totalPercent.toFixed(2) }}</span>
@@ -142,6 +87,7 @@ export default {
     },
   },
   methods: {
+    // MANDAR MÉTODO A CMP ACCOUNT ROW
     closeEditting(index) {
       if (!this.hasError) {
         // eslint-disable-next-line vue/no-mutating-props
@@ -149,6 +95,7 @@ export default {
       }
     },
     closeAccountRow(e) {
+      // HACER QUE SE TRIGGERE ESTA FUNCIÒN DESDE LA CPM MAKE BUDGET
       const edittingRowDiv = document.getElementsByClassName("edditing-row")[0];
       if (
         edittingRowDiv !== undefined &&
@@ -161,6 +108,7 @@ export default {
         }
       }
     },
+    // MANDAR LA FUNCION PARA SER ESCUCHADA EN ACCOUNT ROW
     modifyAmountByIncome() {
       if (this.isValidAmountIncome) {
         this.accounts.forEach((account) => {
@@ -183,34 +131,6 @@ export default {
             account.errorPercentInput = "";
           }
         });
-      }
-    },
-    modifyAmountByPercent(index) {
-      let error = false;
-
-      if (this.accounts[index].percent === "") {
-        this.accounts[index].amount = "0";
-        this.accounts[index].errorPercentInput = "Insert a percent";
-        error = true;
-      }
-
-      if (
-        parseFloat(this.accounts[index].percent) > 100 ||
-        parseFloat(this.accounts[index].percent) < 0
-      ) {
-        this.accounts[index].errorPercentInput =
-          "Percent must be between 0 - 100";
-        error = true;
-      }
-
-      if (!error) {
-        this.accounts[index].amount =
-          this.availableMoney *
-          (parseFloat(this.accounts[index].percent) / 100);
-
-        this.accounts[index].amount = this.accounts[index].amount.toFixed(2);
-        this.accounts[index].errorPercentInput = "";
-        this.accounts[index].errorAmountInput = "";
       }
     },
     modifyPercentByAmount(index) {
@@ -260,30 +180,9 @@ export default {
       });
       return result;
     },
-    // editAccountRow(index) {
-    //   if (
-    //     !this.hasError &&
-    //     this.isValidAmountIncome &&
-    //     !this.accounts[index].default
-    //   ) {
-    //     setTimeout(() => {
-    //       if (!this.accounts[index].isEditting) {
-    //         for (let i = 0; i < this.accounts.length; i++) {
-    //           if (i != index) {
-    //             this.accounts[i].isEditting = false;
-    //           } else {
-    //             this.accounts[i].isEditting = true;
-    //           }
-    //         }
-
-    //         const input = document.getElementById(`percent-input-${index}`);
-    //         setTimeout(() => input.focus(), 25);
-    //       }
-    //     }, 25);
-    //   }
-    // },
   },
   watch: {
+    /* MANDAR WATCHERS A ACCOUNT ROW */
     // eslint-disable-next-line no-unused-vars
     availableMoney(newValue, oldVlue) {
       this.modifyAmountByIncome();

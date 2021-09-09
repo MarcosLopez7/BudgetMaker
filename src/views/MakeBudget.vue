@@ -41,82 +41,12 @@
       <ExpenseList @updateExpenses="updateExpenseList" />
 
       <AccountDistribution
+        ref="AccountDistribution"
         :availableMoney="availableMoney"
         :isValidAmountIncome="isValideIncome"
         v-model:accounts="accounts"
         :totalExpenses="totalExpenses"
       />
-
-      <!-- <h3 class="subtitle">Accounts distribution</h3>
-
-      <div class="table-account-row-carnitaasada header-account">
-        <span>Account</span>
-        <span>Percent</span>
-        <span>Amount</span>
-        <span>Blance</span>
-      </div>
-
-      <div
-        v-for="(account, index) in accounts"
-        class="table-account-row-carnitaasada"
-        test-id="row-account-test"
-        :class="[
-          account.isEditting ? 'edditing-row' : '',
-          account.default ? 'total-row' : '',
-        ]"
-        @click="editAccountRow(index)"
-        :key="index"
-      >
-        <span class="start-row">{{ account.name }}</span>
-        <span test-id="account-percent-test" v-show="!account.isEditting"
-          >%{{ account.percent }}</span
-        >
-        <div v-show="account.isEditting">
-          <input
-            :id="`percent-input-${index}`"
-            class="editting-row-input"
-            :class="{ 'input-error': account.errorPercentInput !== '' }"
-            v-model="account.percent"
-            type="number"
-            @keyup.enter="closeEditting(index)"
-            @input="modifyAmountByPercent(index)"
-          />
-          <span v-show="account.errorPercentInput !== ''" class="field-error">
-            {{ account.errorPercentInput }}
-          </span>
-        </div>
-        <span test-id="account-amount-test" v-show="!account.isEditting"
-          >${{ account.amount }}</span
-        >
-        <div v-show="account.isEditting">
-          <input
-            class="editting-row-input"
-            :class="{ 'input-error': account.errorAmountInput !== '' }"
-            v-model="account.amount"
-            type="number"
-            @keyup.enter="closeEditting(index)"
-            @input="modifyPercentByAmount(index)"
-          />
-          <span v-show="account.errorAmountInput !== ''" class="field-error">
-            {{ account.errorAmountInput }}
-          </span>
-        </div>
-        <span
-          >${{
-            account.amount !== ""
-              ? (
-                  parseFloat(account.amount) + parseFloat(account.balance)
-                ).toFixed(2)
-              : parseFloat(account.balance)
-          }}</span
-        >
-      </div>
-      <div class="table-account-row-carnitaasada total-row">
-        <span class="start-row">Total</span>
-        <span test-id="total-percent-test">%{{ totalPercent.toFixed(2) }}</span>
-        <span test-id="total-amount-test">${{ totalAmount.toFixed(2) }}</span>
-        <span test-id="total-balance-test">${{ totalBalance.toFixed(2) }}</span>
-      </div> -->
     </form>
   </div>
 </template>
@@ -225,27 +155,6 @@ export default {
 
       return Math.round(result * 100) / 100;
     },
-    isEditting() {
-      for (let i = 0; i < this.accounts.length; i++) {
-        if (this.accounts[i].isEditting) {
-          return true;
-        }
-      }
-
-      return false;
-    },
-    hasError() {
-      for (let i = 0; i < this.accounts.length; i++) {
-        if (
-          this.accounts[i].errorPercentInput !== "" ||
-          this.accounts[i].errorAmountInput !== ""
-        ) {
-          return true;
-        }
-      }
-
-      return false;
-    },
     totalExpenses() {
       let result = 0;
       this.expenses.forEach((expense) => (result = result + expense.amount));
@@ -270,17 +179,7 @@ export default {
       return true;
     },
     closeAccountRow(e) {
-      const edittingRowDiv = document.getElementsByClassName("edditing-row")[0];
-      if (
-        edittingRowDiv !== undefined &&
-        !e.target.classList.contains("editting-row-input") &&
-        this.isEditting &&
-        !this.hasError
-      ) {
-        for (let i = 0; i < this.accounts.length; i++) {
-          this.accounts[i].isEditting = false;
-        }
-      }
+      this.$refs.AccountDistribution.closeAccountRow(e);
     },
     incomeInputHandler() {
       if (this.isValidateAmountIncome()) {
