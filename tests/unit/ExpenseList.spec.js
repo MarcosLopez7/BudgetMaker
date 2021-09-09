@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import ExpenseList from "@/components/ExpenseList.vue";
 
-describe("Accounts.vue", () => {
+describe("ExpenseList.vue", () => {
   it("It should render the total sum of the array expenses", () => {
     const wrapper = mount(ExpenseList);
     const totalExpenses = wrapper.find('span[test-id="total-sum"]').text();
@@ -33,6 +33,13 @@ describe("Accounts.vue", () => {
 
     expect(nameExpenses[3].text()).toBe("New Expense");
     expect(amountExpenses[3].text()).toBe("$1000");
+
+    expect(wrapper.emitted("updateExpenses")[0][0]).toMatchObject([
+      { name: "Expense 1", amount: 100 },
+      { name: "Expense 2", amount: 150 },
+      { name: "Expense 3", amount: 75 },
+      { name: "New Expense", amount: 1000 },
+    ]);
   });
 
   it("If user adds an empty expense, it should prompt a error message for blank field", async () => {
@@ -55,6 +62,9 @@ describe("Accounts.vue", () => {
       .text();
 
     expect(errorMessage).toBe("Please insert a name for this expense");
+
+    const updateExpenseCalls = wrapper.emitted("updateExpenses");
+    expect(updateExpenseCalls).toHaveLength(1);
   });
 
   it("If user adds an empty amount, it should prompt a error message for blank field", async () => {
@@ -77,6 +87,9 @@ describe("Accounts.vue", () => {
       .text();
 
     expect(errorMessage).toBe("Please insert an amount for this expense");
+
+    const updateExpenseCalls = wrapper.emitted("updateExpenses");
+    expect(updateExpenseCalls).toHaveLength(1);
   });
 
   it("If user adds an negative or zero amount, it should prompt a error message for non-positive number", async () => {
@@ -99,6 +112,9 @@ describe("Accounts.vue", () => {
       .text();
 
     expect(errorMessage).toBe("Please insert positive number for the amount");
+
+    const updateExpenseCalls = wrapper.emitted("updateExpenses");
+    expect(updateExpenseCalls).toHaveLength(1);
   });
 
   it("Is user clicks on expense, inputs should have data from expense and edit it", async () => {
@@ -125,6 +141,15 @@ describe("Accounts.vue", () => {
 
     expect(nameExpenses[1].text()).toBe("Edited Expense");
     expect(amountExpenses[1].text()).toBe("$150");
+
+    const updateExpenseCalls = wrapper.emitted("updateExpenses");
+    expect(updateExpenseCalls).toHaveLength(2);
+
+    expect(wrapper.emitted("updateExpenses")[0][0]).toMatchObject([
+      { name: "Expense 1", amount: 100 },
+      { name: "Edited Expense", amount: 150 },
+      { name: "Expense 3", amount: 75 },
+    ]);
   });
 
   it("Is user clicks on delete expense, inputs should remove expense from list", async () => {
@@ -143,31 +168,13 @@ describe("Accounts.vue", () => {
 
     expect(nameExpenses.length).toBe(2);
     expect(amountExpenses.length).toBe(2);
-  });
-
-  it("If user makes a modification, a new list of expeses should be emmitted", async () => {
-    const wrapper = mount(ExpenseList);
-
-    await wrapper
-      .find('button[test-id="open-add-expense-button"]')
-      .trigger("click");
-
-    const inputName = wrapper.find('input[test-id="name-expense-input"]');
-    inputName.setValue("New Expense");
-
-    const inputAmount = wrapper.find('input[test-id="amount-expense-input"]');
-    inputAmount.setValue("1000");
-
-    await wrapper.find('button[test-id="save-expense"]').trigger("click");
 
     const updateExpenseCalls = wrapper.emitted("updateExpenses");
     expect(updateExpenseCalls).toHaveLength(2);
 
     expect(wrapper.emitted("updateExpenses")[0][0]).toMatchObject([
       { name: "Expense 1", amount: 100 },
-      { name: "Expense 2", amount: 150 },
       { name: "Expense 3", amount: 75 },
-      { name: "New Expense", amount: 1000 },
     ]);
   });
 });

@@ -6,16 +6,18 @@
         <label for="amountIncome">Amount Income</label>
         <input
           id="amountIncome"
+          test-id="amount-income-test"
           type="number"
           class="form-control"
           :class="{ 'input-error': amount.errorMessage !== '' }"
           placeholder="Amount"
           v-model="amount.input"
           min="0"
-          @input="modifyAmountByIncome()"
+          @input="incomeInputHandler()"
           required
         />
         <span
+          test-id="amount-input-error-msg"
           class="field-error amount-input-error"
           v-show="amount.errorMessage !== ''"
           >{{ amount.errorMessage }}</span
@@ -32,13 +34,20 @@
         />
       </div>
 
-      <span class="available-money">
+      <span test-id="available-money" class="available-money">
         Available Money: ${{ availableMoney }}
       </span>
 
       <ExpenseList @updateExpenses="updateExpenseList" />
 
-      <h3 class="subtitle">Accounts distribution</h3>
+      <AccountDistribution
+        :availableMoney="availableMoney"
+        :isValidAmountIncome="isValideIncome"
+        v-model:accounts="accounts"
+        :totalExpenses="totalExpenses"
+      />
+
+      <!-- <h3 class="subtitle">Accounts distribution</h3>
 
       <div class="table-account-row-carnitaasada header-account">
         <span>Account</span>
@@ -50,6 +59,7 @@
       <div
         v-for="(account, index) in accounts"
         class="table-account-row-carnitaasada"
+        test-id="row-account-test"
         :class="[
           account.isEditting ? 'edditing-row' : '',
           account.default ? 'total-row' : '',
@@ -58,7 +68,9 @@
         :key="index"
       >
         <span class="start-row">{{ account.name }}</span>
-        <span v-show="!account.isEditting">%{{ account.percent }}</span>
+        <span test-id="account-percent-test" v-show="!account.isEditting"
+          >%{{ account.percent }}</span
+        >
         <div v-show="account.isEditting">
           <input
             :id="`percent-input-${index}`"
@@ -73,7 +85,9 @@
             {{ account.errorPercentInput }}
           </span>
         </div>
-        <span v-show="!account.isEditting">${{ account.amount }}</span>
+        <span test-id="account-amount-test" v-show="!account.isEditting"
+          >${{ account.amount }}</span
+        >
         <div v-show="account.isEditting">
           <input
             class="editting-row-input"
@@ -99,10 +113,10 @@
       </div>
       <div class="table-account-row-carnitaasada total-row">
         <span class="start-row">Total</span>
-        <span>%{{ totalPercent.toFixed(2) }}</span>
-        <span>${{ totalAmount }}</span>
-        <span>${{ totalBalance }}</span>
-      </div>
+        <span test-id="total-percent-test">%{{ totalPercent.toFixed(2) }}</span>
+        <span test-id="total-amount-test">${{ totalAmount.toFixed(2) }}</span>
+        <span test-id="total-balance-test">${{ totalBalance.toFixed(2) }}</span>
+      </div> -->
     </form>
   </div>
 </template>
@@ -182,10 +196,12 @@
 */
 import LocalStorageManager from "@/utilities/LocalStorageManager.js";
 import ExpenseList from "@/components/ExpenseList.vue";
+import AccountDistribution from "@/components/AccountDistribution.vue";
 
 export default {
   components: {
     ExpenseList,
+    AccountDistribution,
   },
   data() {
     return {
@@ -201,22 +217,13 @@ export default {
   },
   computed: {
     availableMoney() {
-      let result = this.unassigned;
+      let result = parseFloat(this.unassigned);
 
       if (this.amount.input !== "") {
-        result += this.amount.input;
+        result += parseFloat(this.amount.input);
       }
 
       return Math.round(result * 100) / 100;
-    },
-    totalPercent() {
-      return this.getTotal("percent");
-    },
-    totalAmount() {
-      return this.getTotal("amount");
-    },
-    totalBalance() {
-      return this.getTotal("balance") + this.totalAmount;
     },
     isEditting() {
       for (let i = 0; i < this.accounts.length; i++) {
@@ -244,6 +251,9 @@ export default {
       this.expenses.forEach((expense) => (result = result + expense.amount));
       return result;
     },
+    isValideIncome() {
+      return this.amount.errorMessage === "" && this.amount.input !== "";
+    },
   },
   methods: {
     isValidateAmountIncome() {
@@ -259,11 +269,6 @@ export default {
 
       return true;
     },
-    closeEditting(index) {
-      if (!this.hasError) {
-        this.accounts[index].isEditting = false;
-      }
-    },
     closeAccountRow(e) {
       const edittingRowDiv = document.getElementsByClassName("edditing-row")[0];
       if (
@@ -277,138 +282,13 @@ export default {
         }
       }
     },
-    modifyAmountByIncome() {
+    incomeInputHandler() {
       if (this.isValidateAmountIncome()) {
         this.amount.errorMessage = "";
-        this.accounts.forEach((account) => {
-          if (account.percent !== "" && parseFloat(account.percent) >= 0) {
-            if (!account.default) {
-              account.amount =
-                (this.availableMoney * parseFloat(account.percent)) / 100;
-              account.amount = account.amount.toFixed(2);
-            } else {
-              account.percent =
-                (parseFloat(account.amount) / this.availableMoney) * 100;
-              account.percent = account.percent.toFixed(2);
-            }
-          } else {
-            if (!account.defaul) {
-              account.amount = "0";
-            }
-            account.percent = "0";
-            account.errorAmountInput = "";
-            account.errorPercentInput = "";
-          }
-        });
-      }
-    },
-    modifyAmountByPercent(index) {
-      let error = false;
-
-      if (this.accounts[index].percent === "") {
-        this.accounts[index].amount = "0";
-        this.accounts[index].errorPercentInput = "Insert a percent";
-        error = true;
-      }
-
-      if (
-        parseFloat(this.accounts[index].percent) > 100 ||
-        parseFloat(this.accounts[index].percent) < 0
-      ) {
-        this.accounts[index].errorPercentInput =
-          "Percent must be between 0 - 100";
-        error = true;
-      }
-
-      if (!error) {
-        this.accounts[index].amount =
-          this.availableMoney *
-          (parseFloat(this.accounts[index].percent) / 100);
-
-        this.accounts[index].amount = this.accounts[index].amount.toFixed(2);
-        this.accounts[index].errorPercentInput = "";
-        this.accounts[index].errorAmountInput = "";
-      }
-    },
-    modifyPercentByAmount(index) {
-      let error = false;
-
-      if (this.accounts[index].amount === "") {
-        this.accounts[index].percent = "0";
-        this.accounts[index].errorAmountInput = "Insert an amount";
-        error = true;
-      }
-
-      if (parseFloat(this.accounts[index].amount) < 0) {
-        this.accounts[index].percent = "0";
-        this.accounts[index].errorAmountInput =
-          "Negative numbers aren't allowes";
-        error = true;
-      }
-
-      if (
-        parseFloat(this.accounts[index].amount) > this.availableMoney &&
-        !this.accounts[index].default
-      ) {
-        this.accounts[index].errorAmountInput =
-          "Amount must be lower than available money";
-        error = true;
-      }
-
-      if (!error) {
-        if (this.availableMoney != 0) {
-          this.accounts[index].percent =
-            (parseFloat(this.accounts[index].amount) / this.availableMoney) *
-            100;
-          this.accounts[index].percent =
-            this.accounts[index].percent.toFixed(2);
-        } else {
-          this.accounts[index].percent = "0";
-        }
-        this.accounts[index].errorAmountInput = "";
-      }
-    },
-    getTotal(attr) {
-      let result = 0;
-      this.accounts.forEach((account) => {
-        if (account[attr] !== "" && parseFloat(account[attr]) >= 0) {
-          result = result + parseFloat(account[attr]);
-        }
-      });
-      return result;
-    },
-    editAccountRow(index) {
-      if (
-        !this.hasError &&
-        this.isValidateAmountIncome() &&
-        !this.accounts[index].default
-      ) {
-        setTimeout(() => {
-          if (!this.accounts[index].isEditting) {
-            for (let i = 0; i < this.accounts.length; i++) {
-              if (i != index) {
-                this.accounts[i].isEditting = false;
-              } else {
-                this.accounts[i].isEditting = true;
-              }
-            }
-
-            const input = document.getElementById(`percent-input-${index}`);
-            setTimeout(() => input.focus(), 25);
-          }
-        }, 25);
       }
     },
     updateExpenseList(expenseList) {
       this.expenses = expenseList;
-
-      for (let i = 0; i < this.accounts.length; i++) {
-        if (this.accounts[i].default) {
-          this.accounts[i].amount = this.totalExpenses;
-          this.modifyPercentByAmount(i);
-          break;
-        }
-      }
     },
     loadDate() {
       const date = new Date(Date.now());
